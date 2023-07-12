@@ -1,6 +1,7 @@
 package com.gpertile.springbootmongo.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,25 @@ public class UserService {
 		}
 	}
 
+	public User update(User obj) {
+
+		try {
+			Optional<User> entity = repository.findById(obj.getId());
+			User user = entity.get();
+			updateData(user, obj);
+
+			return repository.save(user);
+		} catch (NoSuchElementException e) {
+			throw new ObjectNotFoundException(obj.getId());
+		}
+	}
+
 	public User fromDTO(UserDTO objDto) {
 		return new User(objDto.getId(), objDto.getName(), objDto.getEmail());
 	}
 
+	private void updateData(User user, User obj) {
+		user.setName(obj.getName());
+		user.setEmail(obj.getEmail());
+	}	
 }
